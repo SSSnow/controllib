@@ -53,25 +53,42 @@ class __EXPORT BlockSweep : public Block
 public:
 // methods
 	BlockSweep(SuperBlock *parent, const char *name) :
-		Block(parent, name){}
+		Block(parent, name),
+        _max_bandwith(6.f),
+        _min_bandwith(0.1f),
+        _amplitude(1.0f),
+        _freq_factor(5.f),
+        _amp_factor(30.f),
+        _period(60.f),
+        _duration(0.f),
+        {}
 
+    virtual ~BlockSweep() = default;
     
     /* bandwith factor: k(t) = exp(freq_f*t/T - 1)/exp(freq_f)
      * amplitude factor: n(t) = exp(amp_f*t/T - 1)/exp(amp_f)   
      * bandwith: w(t) = bw_min + k(t) * (bw_max - bw_min)
      * angle: theta(t) = integrate(w(t))
      * sweep signal: sweep(t) = A * (1 - n(t))sin(theta(t)) 
-     * /
+     */
+    float update(float dt);
+
+    void reset()
+    {
+        _duration = 0;
+    }
 
 // members
 protected:
-    float _max_bandwith;    //2.5*bandwith_180 the bw_180 is the bandwith which is the phase error at 180deg
-    float _min_bandwith;    //0.5*bandwith_135 the bw_135 is the common bandwith which is the phase error at 135deg
+    float _max_bandwith;    //hz = 2*pi rad, 2.5*bandwith_180 the bw_180 is the bandwith which is the phase error at 180deg
+    float _min_bandwith;    //hz = 2*pi rad, 0.5*bandwith_135 the bw_135 is the common bandwith which is the phase error at 135deg
     float _amplitude;       //sweep signal 
     float _freq_factor;     //the sin frequency exponential growth factor
     float _amp_factor;      //the amplitude exponential decline factor
-    float _duration;        // the signal generate duration
+    float _period;        //s the signal generate duration
 
+private:
+    float _duration;        // the duration of the run
 
 }
 
